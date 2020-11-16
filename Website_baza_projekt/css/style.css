@@ -1,0 +1,219 @@
+body{
+    padding: 0;
+    margin: 0;
+
+    background-color: rgb(249, 249, 248);
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a{
+    color: black;
+    
+}
+
+/* Header */
+
+.row{
+    padding: 10px 30px 10px 30px;
+}
+
+.razmak{
+    padding-bottom: 10px;
+}
+
+.btn{
+    background-color: rgb(0, 58, 90);
+    border-color: rgb(0, 58, 90);
+}
+
+.btn:hover{
+    color: rgb(0, 58, 90);
+    background-color: white;
+    
+}
+
+
+
+.naslov{
+    font-family: "Times New Roman", Times, serif;
+    font-size: 50pt;
+    font-weight: bold;  
+    letter-spacing: -3px;
+    color: rgb(0, 58, 90);
+    text-align: center;
+}
+.naslov::after{
+    font-size: 30pt;
+}
+
+.nounderline:hover{
+    text-decoration: none;
+}
+
+
+.header{
+    color: rgb(0, 58, 90);
+    padding-top: 0;
+}
+
+.navigation-white{
+    background-color: white;
+}
+
+.nav-link{
+    color: rgb(0, 58, 90) !important;
+    font-weight: bold;
+    text-align: center !important;
+}
+
+.no-padding{
+    padding: 0 0 0 0 !important;
+}
+
+
+
+.navbar div ul li{
+    border-bottom: 1px solid white;
+    padding: 0 0 0 0 !important;
+    color: rgb(0, 58, 90);
+    font-weight: bold;
+    text-align: center !important;
+}
+
+
+
+/* Artikli */
+main{
+    background-color: white;
+    padding-top: 10px;
+}
+
+
+
+
+.clanak a, .clanak h3{
+    color: black;
+    font-weight: bold;
+    font-size: 18pt;
+    padding-bottom: 5px;
+    padding-top: 15px;
+}
+
+.navbar-toggler{
+    color: rgb(0, 58, 90) !important;
+    border-color: rgb(0, 58, 90) !important;
+    background-color: rgb(0, 58, 90) !important;
+}
+
+.clanak img{
+    background-size: contain;
+}
+
+.clanak p{
+    color: rgb(51, 51, 51);
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+.clanak span{
+    color: lightgray;
+    font-size: 10px;
+    padding-bottom: 10px;
+   
+}
+
+.clanak pre{
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    white-space: pre;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+
+
+/* Footer */
+
+.footer{
+    position:relative;
+    border-color:white;
+    font-size: 10px;
+    background-color: white;
+}
+
+.footer div h1{
+    color: white;
+}
+
+.c1{
+	list-style-type: square;
+	color: rgb(199, 142, 67);
+	font-size: 23px;
+  }
+
+  .c2{
+	list-style-type: square;
+	color: purple;
+	font-size: 23px;
+  }
+
+  .c3{
+	list-style-type: square;
+	color: rgb(103, 144, 221);
+	font-size: 23px;
+  }
+
+  ul li h3{
+	font-weight: bold;
+	color: black;
+  }
+  .ul-nomargin{
+      margin: 0%;
+      padding: 0%;
+  }
+
+.clanak-title{
+    text-align: center;
+    font-size: 50px;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    color: black;
+}
+
+.clanak-wrapper {
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+}
+
+.clanak-datum{
+    font-weight: bold;
+    color: black;
+    font-size: 15px;
+}
+
+.clanak-center{
+    text-align: center !important;
+}
+
+.undertitle{
+	margin-top: -2%;
+	font-size: 19px;
+	font-family: "Verdana", Verdana, sans-serif;
+    color:gray;
+    text-align: center !important;
+  }
+
+  .hr1{
+	margin-top: 0;
+	margin-bottom: 0%;
+    padding-bottom: 0%;
+    border-top:1px solid black;
+  }
+.hr2{
+  margin-top: 0;
+  margin-bottom: 0%;
+  padding-bottom: 0%;
+  border-style: dotted;
+}
