@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1515801095 source:c:\users\vedran\desktop\programiranje\prvi semestar\sigurne_i_nesigurne_lozinke\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

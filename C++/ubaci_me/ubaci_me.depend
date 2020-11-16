@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1510694371 source:c:\users\vedran\desktop\programiranje\prvi semestar\ubaci_me\main.c
+	<stdio.h>
+	<stdlib.h>
+

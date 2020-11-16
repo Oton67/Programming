@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1516362549 source:c:\users\vedran\desktop\programiranje\prvi semestar\thundercoin\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1535373183 source:c:\users\gamer\desktop\prvi semestar\thundercoin\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
