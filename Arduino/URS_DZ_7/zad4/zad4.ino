@@ -1,0 +1,145 @@
+#include <OneWire.h>
+OneWire ds(10);
+
+#define OP_NOOP   0
+#define OP_DIGIT0 1
+#define OP_DIGIT1 2
+#define OP_DIGIT2 3
+#define OP_DIGIT3 4
+#define OP_DIGIT4 5
+#define OP_DIGIT5 6
+#define OP_DIGIT6 7
+#define OP_DIGIT7 8
+#define OP_DECODEMODE  9
+#define OP_INTENSITY   10
+#define OP_SCANLIMIT   11
+#define OP_SHUTDOWN    12
+#define OP_DISPLAYTEST 15
+#define button_left A2
+#define button_right A3
+
+
+int CLK = 5; // 5 = PD5
+int LOAD = 6; // 6 = PD6
+int DIN = 7; // 7 = PD7
+
+unsigned long last_millis = 0;
+
+byte left_digit[10][8] =
+{ {0xE0, 0xA0, 0xA0, 0xA0, 0xE0, 0x00, 0x00, 0x00}, // 0
+  {0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00}, // 1
+  {0xE0, 0x20, 0xE0, 0x80, 0xE0, 0x00, 0x00, 0x00}, // 2
+  {0xE0, 0x20, 0xE0, 0x20, 0xE0, 0x00, 0x00, 0x00}, // 3
+  {0xA0, 0xA0, 0xE0, 0x20, 0x20, 0x00, 0x00, 0x00}, // 4
+  {0xE0, 0x80, 0xE0, 0x20, 0xE0, 0x00, 0x00, 0x00}, // 5
+  {0xE0, 0x80, 0xE0, 0xA0, 0xE0, 0x00, 0x00, 0x00}, // 6
+  {0xE0, 0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00}, // 7
+  {0xE0, 0xA0, 0xE0, 0xA0, 0xE0, 0x00, 0x00, 0x00}, // 8
+  {0xE0, 0xA0, 0xE0, 0x20, 0xE0, 0x00, 0x00, 0x00}  // 9
+};
+
+byte right_digit[10][8] =
+{ {0x07, 0x05, 0x05, 0x05, 0x07, 0x00, 0x00, 0x00}, // 0
+  {0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00}, // 1
+  {0x07, 0x01, 0x07, 0x04, 0x07, 0x00, 0x00, 0x00}, // 2
+  {0x07, 0x01, 0x07, 0x01, 0x07, 0x00, 0x00, 0x00}, // 3
+  {0x05, 0x05, 0x07, 0x01, 0x01, 0x00, 0x00, 0x00}, // 4
+  {0x07, 0x04, 0x07, 0x01, 0x07, 0x00, 0x00, 0x00}, // 5
+  {0x07, 0x04, 0x07, 0x05, 0x07, 0x00, 0x00, 0x00}, // 6
+  {0x07, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00}, // 7
+  {0x07, 0x05, 0x07, 0x05, 0x07, 0x00, 0x00, 0x00}, // 8
+  {0x07, 0x05, 0x07, 0x01, 0x07, 0x00, 0x00, 0x00}  // 9
+};
+
+byte minus[8] =
+{
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3C, 0x00
+};
+
+
+int temp;
+byte negative = 0;
+
+
+void sendData( byte address, byte data)
+{
+  byte packet[2];
+  byte bitmask;
+  byte i;
+  packet[0] = address;
+  packet[1] = data;
+
+  for (i = 0; i < 2; i++)
+    for ( bitmask = 0x80 ; bitmask != 0 ; bitmask = bitmask >> 1 )
+    {
+      if (bitmask & packet[i]) digitalWrite(DIN, 1);
+      else digitalWrite(DIN, 0);
+
+      digitalWrite(CLK, HIGH);
+      digitalWrite(CLK, LOW);
+    }
+  digitalWrite(LOAD, HIGH);
+  digitalWrite(LOAD, LOW);
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(DIN, OUTPUT);
+  pinMode(CLK, OUTPUT);
+  pinMode(LOAD, OUTPUT);
+  pinMode(button_left, INPUT_PULLUP);
+  pinMode(button_right, INPUT_PULLUP);
+  pinMode(13, OUTPUT);
+  digitalWrite(LOAD, LOW);
+
+  Serial.begin(9600);
+
+
+  sendData(OP_DISPLAYTEST, 0);
+  sendData(OP_INTENSITY, 0);
+  sendData(OP_SCANLIMIT, 7);
+
+  sendData(OP_DECODEMODE, 0);
+  sendData(OP_SHUTDOWN, 1);
+  for (int i = 0; i < 8; i++) sendData(i + 1, 0b00000000);
+
+
+}
+
+void Temp()
+{
+  ds.reset();
+  ds.write(0xCC); //skip rom
+  ds.write(0x44); // Convert (počinje mjeriti temperaturu
+  delay(1000); // treba mu barem 750ms
+  ds.reset();
+  ds.write(0xCC); //skip rom
+  ds.write(0xBE); // read ScratchPad
+  byte dsData[9];
+  for (int i = 0; i < 9; i++)
+  {
+    dsData[i] = ds.read();
+
+  }
+  int16_t intTemp = 0x0000;
+  intTemp = dsData[1];
+  intTemp = intTemp << 8;
+  intTemp = intTemp | dsData[0];
+
+  temp=intTemp/16;
+}
+
+
+void loop() {
+
+  Temp();
+
+  if (temp<0) for (int i = 0; i < 8; i++) sendData(i + 1, left_digit[temp / 10][i] | right_digit[temp % 10][i] | minus[i]);
+  else for (int i = 0; i < 8; i++) sendData(i + 1, left_digit[temp / 10][i] | right_digit[temp % 10][i]);
+
+
+
+}
+
+
+

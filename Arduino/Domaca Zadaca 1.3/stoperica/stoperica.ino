@@ -1,0 +1,178 @@
+// binarno brojilo
+
+#define OP_NOOP   0
+#define OP_DIGIT0 1
+#define OP_DIGIT1 2
+#define OP_DIGIT2 3
+#define OP_DIGIT3 4
+#define OP_DIGIT4 5
+#define OP_DIGIT5 6
+#define OP_DIGIT6 7
+#define OP_DIGIT7 8
+#define OP_DECODEMODE  9
+#define OP_INTENSITY   10
+#define OP_SCANLIMIT   11
+#define OP_SHUTDOWN    12
+#define OP_DISPLAYTEST 15
+#define button 8
+
+
+int CLK = 5; // 5 = PD5
+int LOAD = 6; // 6 = PD6
+int DIN = 7; // 7 = PD7
+
+unsigned long last_millis = 0;
+
+byte left_digit[10][8] =
+{ {0x00, 0x00, 0x00, 0xE0, 0xA0, 0xA0, 0xA0, 0xE0}, // 0
+  {0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20}, // 1
+  {0x00, 0x00, 0x00, 0xE0, 0x20, 0xE0, 0x80, 0xE0}, // 2
+  {0x00, 0x00, 0x00, 0xE0, 0x20, 0xE0, 0x20, 0xE0}, // 3
+  {0x00, 0x00, 0x00, 0xA0, 0xA0, 0xE0, 0x20, 0x20}, // 4
+  {0x00, 0x00, 0x00, 0xE0, 0x80, 0xE0, 0x20, 0xE0}, // 5
+  {0x00, 0x00, 0x00, 0xE0, 0x80, 0xE0, 0xA0, 0xE0}, // 6
+  {0x00, 0x00, 0x00, 0xE0, 0x20, 0x20, 0x20, 0x20}, // 7
+  {0x00, 0x00, 0x00, 0xE0, 0xA0, 0xE0, 0xA0, 0xE0}, // 8
+  {0x00, 0x00, 0x00, 0xE0, 0xA0, 0xE0, 0x20, 0xE0}  // 9
+};
+
+byte right_digit[10][8] =
+{ {0x00, 0x00, 0x00, 0x07, 0x05, 0x05, 0x05, 0x07}, // 0
+  {0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01}, // 1
+  {0x00, 0x00, 0x00, 0x07, 0x01, 0x07, 0x04, 0x07}, // 2
+  {0x00, 0x00, 0x00, 0x07, 0x01, 0x07, 0x01, 0x07}, // 3
+  {0x00, 0x00, 0x00, 0x05, 0x05, 0x07, 0x01, 0x01}, // 4
+  {0x00, 0x00, 0x00, 0x07, 0x04, 0x07, 0x01, 0x07}, // 5
+  {0x00, 0x00, 0x00, 0x07, 0x04, 0x07, 0x05, 0x07}, // 6
+  {0x00, 0x00, 0x00, 0x07, 0x01, 0x01, 0x01, 0x01}, // 7
+  {0x00, 0x00, 0x00, 0x07, 0x05, 0x07, 0x05, 0x07}, // 8
+  {0x00, 0x00, 0x00, 0x07, 0x05, 0x07, 0x01, 0x07}  // 9
+};
+
+byte seconds[6][8] =
+{ {0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 0-10
+  {0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 10-20
+  {0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 20-30
+  {0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 30-40
+  {0x7C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 40-50
+  {0x7E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // 50-60
+};
+
+
+
+void sendData( byte address, byte data)
+{
+  byte packet[2];
+  byte bitmask;
+  byte i;
+  packet[0] = address;
+  packet[1] = data;
+
+  for (i = 0; i < 2; i++)
+    for ( bitmask = 0x80 ; bitmask != 0 ; bitmask = bitmask >> 1 )
+    {
+      if (bitmask & packet[i]) digitalWrite(DIN, 1);
+      else digitalWrite(DIN, 0);
+
+      digitalWrite(CLK, HIGH);
+      digitalWrite(CLK, LOW);
+    }
+  digitalWrite(LOAD, HIGH);
+  digitalWrite(LOAD, LOW);
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(DIN, OUTPUT);
+  pinMode(CLK, OUTPUT);
+  pinMode(LOAD, OUTPUT);
+  pinMode(button, INPUT_PULLUP);
+  pinMode(13, OUTPUT);
+  digitalWrite(LOAD, LOW);
+
+  randomSeed(analogRead(0));
+
+  Serial.begin(9600);
+
+
+  sendData(OP_DISPLAYTEST, 0);
+  sendData(OP_INTENSITY, 0);
+  sendData(OP_SCANLIMIT, 7);
+
+  sendData(OP_DECODEMODE, 0);
+  sendData(OP_SHUTDOWN, 1);
+  for (int i = 0; i < 8; i++) sendData(i + 1, 0b00000000);
+
+
+}
+
+byte left_num = 0;
+byte right_num = 0;
+byte sec = 0;
+byte sec_count = 0;
+byte left_count = 0;
+byte right_count = 0;
+
+byte start = 0;
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if (digitalRead(button) == 0) start = 1;
+  if (digitalRead(button) == 0 && start == 1)
+  {
+    left_num = 0;
+    right_num = 0;
+    sec = 0;
+    sec_count = 0;
+    left_count = 0;
+    right_count = 0;
+  }
+
+  if (start)
+  {
+    if (millis() - last_millis > 1000)
+    {
+      sec += 1;
+      if (sec >= 10)
+      {
+        sec_count += 1;
+        sec = 0;
+      }
+
+      if (sec_count >= 6)
+      {
+        sec_count = 0;
+        right_count += 1;
+      }
+
+      if (right_count >= 10)
+      {
+        right_count = 0;
+        left_count += 1;
+      }
+
+      if (left_count >= 10)
+      {
+        Serial.println("Error - time exceeded");
+        left_count = 0;
+
+
+      }
+      last_millis = millis();
+    }
+
+
+  }
+
+
+  for (int i = 0; i < 8; i++) sendData(i + 1, seconds[sec_count][i] | left_digit[left_count][i] | right_digit[right_count][i]);
+
+
+
+
+}
+
+
+
+
+
