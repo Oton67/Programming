@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1508520872 source:c:\users\vedran\desktop\programiranje\ghetto_kalkulator\main.c
+	<stdio.h>
+	<stdlib.h>
+

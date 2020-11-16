@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1515064807 source:c:\users\vedran\desktop\programiranje\prvi semestar\novogodisnji_afterparty\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
